@@ -1,0 +1,9 @@
+cs50/cenv
+
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
+cs50Expo/node_modules/
+
+# Expo
+cs50Expo/.expo/
