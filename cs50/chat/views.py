@@ -349,6 +349,7 @@ def community_chats(request):
         else:
             _last_text_time = _.community.created
             _message = 'Silent Night'
+            _time = process_time(str(_.community.created))
         comm_list.append({ 'community_pfp' : comm_pfp ,'community_name' : _.community.name, 'community_is_private' : _.community.is_private, 'community_id' : _.community.id, 'community_last_text' : _message, 'community_last_text_time' : _last_text_time, 'time': _time})
     comm_list.sort(key=lambda x: x['community_last_text_time'], reverse=True)
     
