@@ -77,5 +77,71 @@ Our backend server runs Django rest frame work. It consists of 2 applications.
 
 ## Front End
 
+    Communities front end is built in react native using ajax to fetch the needed data from the backend server
+
+### Some folders to be noted:
+    1.  Components:
+            Contains JavaScript files used to configure our application screens
+    2.  Images:
+            Provide static image files already bundled with the application
+    3.  App.js:
+            Access point to our application. Contains a general contxt provider to make global variables available through our app.
+    4.  app.json:
+            Dependecy list for our react native front end.
+    5.  application.js:
+            Houses Navigation stack
+    6. gitignore:
+            All node modules have been ignored by version contol. The local backend virtual environment is also ignored. If your virtual environment is not named cenv., you would need to edit this file to have your file name to ignore it.
 
 
+
+
+
+
+## Technology Used:
+### Back End:
+#### Django: 
+        Django is the backend web framework community is built with. It runs python and uses and ORM to organize the databse safely. I chose it for it battery included features and security enhancements. Using the ORM, there is also no need to write SQL with django and it comes with it's own built in form validation, password hashing and data check.
+
+#### Django Rest Framwork:
+        It is a software for building RESTful APIs. Cumminities run on a react native front end and uses ajac to communicate with out backend. DRF is built on django to enable django to serialize and return json to the front end
+
+#### Channels:
+        Channels allows multiple layers to interact with each other. it allows us to send notifications fron one layer to another about events happening in it. I have configured chanells with the test in memory layer. In production, ideally redis would be usued.
+
+####  Django-cors-headers:
+        Used to allow our react native front end interact with our django backend. Django does not originally allow cross origin.
+
+####  pillow:
+            Used to hanle images safely in django.
+
+
+
+### Front End:
+
+####    expo:
+            Used to initialize and manage react projects
+####    npm: 
+            package manager
+####    react native vector icons:
+            Provide icons to enhance our app look and feel
+####    expo-image-picker:
+            Used to select image from our gallery into application memory
+####    react-navigation-stack:
+            Allow us to create navigation fron screen to screen
+####    expo-location:
+            Allows application to request user location to provide a good experience.
+
+        
+## Core Features /  Fucntionalities
+
+### Proximity connection:
+        Connects users to people close to them of same interest. Displays distance of users from one another on their post. Users who choose not to allow their lcoation cannot find new communities by scan. Only by search.
+
+### Real Time Updates:
+        Built around Django with channels, community runs asynchronously. Using multiple sockets to handle private comversations and group sockets to handle group conversations. Each group has it's own socket. So does every user currently online. If users get disconnected, conncetion is persistence and reconnects on revanigation to the application.
+
+### Privacy:
+        Users can have as much privacy as they'd like on communities. You can ban users and delete messages by sliding on them. Messages would be deleted for both paticipants.
+
+#   THE END
