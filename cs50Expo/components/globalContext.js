@@ -46,6 +46,7 @@ export const GeneralContextProvider = ({ children }) => {
             // on receive from server 
             globalWS.onmessage = (e) => {
                 const data = JSON.parse(e.data);
+                console.log(data);
                 data['type'] === 'comm_signal' && setComm(data['message'])
                 data['type'] === 'connection_established' && setMsgCount(data['unread']);
                 // check signal type and take action
@@ -54,10 +55,14 @@ export const GeneralContextProvider = ({ children }) => {
                     setMsgCount(data['unread']);
                     setUnRead(data['unread_ids']);
                     // check this isn't a new chat
-                    if (data['chat_id']){
-                        setChatList((prev) => [prev.find((item)=> item['chat']['id'] === data['chat_id'])].concat(prev.filter((item)=> item['chat']['id'] !== data['chat_id'] && item)))
+                    if (data['chat_id']) {
+                        if (chatList.find((item) => item['chat']['id'] === data['chat_id']) !== undefined) {
+
+                            setChatList((prev) => [prev.find((item) => item['chat']['id'] === data['chat_id'])].concat(prev.filter((item) => item['chat']['id'] !== data['chat_id'] && item)))
+
+                        }
                     }
-                    
+
 
                 }
                 data['type'] === 'notif_count' && setNotifCount(data['notif_count']);
@@ -89,7 +94,7 @@ export const GeneralContextProvider = ({ children }) => {
     if (socket) {
         socket.send(JSON.stringify({ 'message': 'get_notif_count' }));
     }
-    
+
 
 
     // auto connect in case of unsuspected misconnection

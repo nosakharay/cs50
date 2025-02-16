@@ -1,4 +1,4 @@
-import { StyleSheet, View, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ActivityIndicator, FlatList, Text } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useState, useCallback } from 'react';
 import SCommunity from './community/singleCommunity';
@@ -62,8 +62,9 @@ export default function MyCommunity() {
                         }
                     {isLoading ? <ActivityIndicator /> :
                         <>
+                        { data['communities'].length ===0 ? <Text style={{fontSize: baseFontSize * 8, fontWeight:'900', textAlign:'center'}}>You're yet to join a community.</Text> :
                             <FlatList data={data['communities']} renderItem={({ item }) =>
-                                <SCommunity isPrivate={item['is_private']} id={item['community']} creator={item['creator']} name={item['name']} memberCount={item['member_count']} communityPfp={item['pfp']} />} />
+                                <SCommunity isPrivate={item['is_private']} id={item['community']} creator={item['creator']} name={item['name']} memberCount={item['member_count']} communityPfp={item['pfp']} />} />}
                         </>
                     }
                     </View>

@@ -8,7 +8,7 @@ import { useNavigation } from "@react-navigation/native";
 import FIcon from 'react-native-vector-icons/FontAwesome5'
 import * as ImagePicker from 'expo-image-picker';
 import FeatherIcon from 'react-native-vector-icons/Feather';
-import Layout, {bodyHeight, bodyWidth, baseFontSize} from "./layout";
+import Layout, { bodyHeight, bodyWidth, baseFontSize } from "./layout";
 
 const { width, height } = Dimensions.get('screen');
 
@@ -39,6 +39,9 @@ export default function CPosts(props) {
     // is searing member
     const [isSearching, SetIsSearching] = useState(false);
 
+    // what field is being edited
+    const [editing, setEditing] = useState(null);
+
     // list of banned members
     const [banned, SetBanned] = useState([]);
 
@@ -58,9 +61,11 @@ export default function CPosts(props) {
         try {
             const response = await fetch('http://192.168.0.4:8000/api-person/get-community-posts?id=' + id);
             const result = await response.json();
+            console.log(result);
             if (response.status === 200) {
                 setData(result);
                 setIsLoading(false);
+                // set to empty string if result community returns null
                 setIsPrivate(result['community_details']['community_is_private']);
                 SetNewCommunityName(result['community_details']['community_name'])
                 SetNewCommunityDescription(result['community_details']['community_description'])
@@ -157,6 +162,7 @@ export default function CPosts(props) {
                 );
             }
             form.append('description', newCommunityDescription);
+            console.log(newCommunityDescription);
             form.append('isPrivate', isPrivate);
             form.append('communityId', data['community_details']['community_id']);
 
@@ -227,7 +233,7 @@ export default function CPosts(props) {
         get();
     }, []);
 
-// auto update member list on search
+    // auto update member list on search
     const updateMemList = (event) => {
         // if member is not null
         if (requests['members']) {
@@ -246,21 +252,21 @@ export default function CPosts(props) {
     }
 
     // function to unban user
-    const liftBan = async(userId, communityId) => {
+    const liftBan = async (userId, communityId) => {
         try {
-            const resp = await fetch('http://192.168.0.4:8000/api-person/lift-ban?userId='+userId+'&communityId='+communityId);
-            if (resp.status===200){
+            const resp = await fetch('http://192.168.0.4:8000/api-person/lift-ban?userId=' + userId + '&communityId=' + communityId);
+            if (resp.status === 200) {
                 // remove member from banned list and push member to unbanned list
-                const tempBan = banned.filter((item)=> item && item['id'] !== userId);
+                const tempBan = banned.filter((item) => item && item['id'] !== userId);
                 const latestUnbanned = banned.find(dict => dict.id === userId);
                 SetBanned(tempBan);
                 SetSResult((prev) => [...prev, latestUnbanned]);
                 return;
             }
-            if(resp.status === 403){
+            if (resp.status === 403) {
                 const result = await resp.json()
                 setErr(result['err']);
-                setTimeout(()=>{
+                setTimeout(() => {
                     setErr('');
                 }, 3000);
             }
@@ -289,7 +295,7 @@ export default function CPosts(props) {
                 // add user to banned user list
                 SetBanned((prevBanned) => [...prevBanned, newBannedPerson]);
                 // delete user from unbanned user list
-                newUnbannedList = sResult.filter((item)=> item && item !== newBannedPerson);
+                newUnbannedList = sResult.filter((item) => item && item !== newBannedPerson);
                 SetSResult(newUnbannedList);
             }
 
@@ -298,18 +304,6 @@ export default function CPosts(props) {
         };
     }
 
-
-
-    useEffect(() => {
-        const KeyboardShow = Keyboard.addListener('keyboardWillShow', () => { SetIsSearching(true) });
-        const KeyboardHide = Keyboard.addListener('keyboardWillHide', () => { SetIsSearching(false) });
-
-        return () => {
-            KeyboardShow.remove();
-            KeyboardHide.remove();
-        }
-
-    }, []);
 
     return (
         <>
@@ -442,7 +436,9 @@ export default function CPosts(props) {
                     <View style={{ padding: width / 50, paddingBottom: height / 3 }}>
                         <View style={{ flexDirection: 'row' }}>
                             <View>
-                                <TextInput style={[styles.textInput, { width: width * 0.8 }]} placeholder="Search for member" onChangeText={updateMemList} />
+                                <TextInput onFocus={() => {
+                                    SetIsSearching(true);
+                                }} onBlur={() => { SetIsSearching(false) }} style={[styles.textInput, { width: width * 0.8 }]} placeholder="Search for member" onChangeText={updateMemList} />
                             </View>
 
                             <TouchableOpacity style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', alignContent: 'center', width: width * 0.15 }}
@@ -544,10 +540,10 @@ export default function CPosts(props) {
                                                     </View>
                                                     <View style={{ width: (width * 0.9) * 0.3, textAlign: "center", flexDirection: 'row', justifyContent: "center", display: "flex" }}>
                                                         <View>
-                                                            <TouchableOpacity 
-                                                            onPress={()=>{
-                                                                liftBan(item['id'], data['community_details']['community_id']);
-                                                            }}
+                                                            <TouchableOpacity
+                                                                onPress={() => {
+                                                                    liftBan(item['id'], data['community_details']['community_id']);
+                                                                }}
                                                             >
                                                                 <Text style={[{ color: "white", backgroundColor: 'orange', padding: width / 100, fontWeight: "900", borderRadius: width / 50 }]}>
                                                                     Lift ban
@@ -570,69 +566,69 @@ export default function CPosts(props) {
 
             </View>
 
-<Layout>
-    <View style={{height:bodyHeight}}>
+            <Layout>
+                <View style={{ height: bodyHeight }}>
 
-            {
-                isLoading ? <ActivityIndicator />
-                    :
-                    <>
-                        <View style={{height:bodyHeight}}>
-
-            
-                            <View style={styles.head}>
-
-                                <TouchableOpacity style={styles.active}>
-                                    <Text>
-                                        {newCommunityName}
-                                    </Text>
-                                </TouchableOpacity>
-                            </View>
+                    {
+                        isLoading ? <ActivityIndicator />
+                            :
+                            <>
+                                <View style={{ height: bodyHeight }}>
 
 
-                            {isLoading ? <ActivityIndicator /> : data['isMod'] === true &&
+                                    <View style={styles.head}>
 
-                                <View style={{ textAlign: 'center' }}>
-                                    <TouchableOpacity onPress={() => {
-                                        get_requests(0, 0);
-                                    }}
-                                        style={{ textAlign: "center", width: width / 4, alignSelf: 'center', justifyContent: "center" }}
-                                    >
-
-                                        <IIcons style={{ textAlign: "center", alignSelf: "center" }} name="settings" size={iconSize} color={'orange'} onPress={() => {
-                                            get_requests(0, 0);
-                                        }} />
-                                    </TouchableOpacity>
+                                        <TouchableOpacity style={styles.active}>
+                                            <Text>
+                                                {newCommunityName}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    </View>
 
 
+                                    {isLoading ? <ActivityIndicator /> : data['isMod'] === true &&
+
+                                        <View style={{ textAlign: 'center' }}>
+                                            <TouchableOpacity onPress={() => {
+                                                get_requests(0, 0);
+                                            }}
+                                                style={{ textAlign: "center", width: width / 4, alignSelf: 'center', justifyContent: "center" }}
+                                            >
+
+                                                <IIcons style={{ textAlign: "center", alignSelf: "center" }} name="settings" size={iconSize} color={'orange'} onPress={() => {
+                                                    get_requests(0, 0);
+                                                }} />
+                                            </TouchableOpacity>
+
+
+                                        </View>
+                                    }
+
+                                    {newCommunityDescription &&
+                                        <Text style={{ padding: iconSize }}>
+                                            {newCommunityDescription}
+                                        </Text>
+                                    }
+
+                                    {
+                                        data['notMember'] && <Text style={{ fontWeight: '900', padding: iconSize / 2 }}>You are not a member of this community so you can only see posts available to the public.</Text>
+                                    }
+                                    {data['length'] === 0 ? <Text style={{ fontWeight: '900', textAlign: 'center', fontSize: width / 20 }}>NO POSTS YET</Text> :
+
+                                        <>
+
+                                            <FlatList data={data['post_list']} renderItem={({ item }) =>
+                                                <Post userId={data['user_id']} opId={item['op_id']} communityIsPrivate={data['community_details']['community_is_private']} communityName={data['community_details']['community_name']} communityId={id} isShared={item['is_shared']} id={item['id']} oppfp={item['oppfp']} post={item['post']} display={item['display']} op={item['op']} media1={item['media1']} likes={item['likes']} frowns={item['frowns']} ghost_likes={item['ghost_likes']} comments={item['comments']} shares={item['shares']} allege={item['allege']} />
+                                            } />
+                                        </>
+
+                                    }
                                 </View>
-                            }
+                            </>
+                    }
+                </View>
+            </Layout>
 
-                            {newCommunityDescription &&
-                                <Text style={{ padding: iconSize }}>
-                                    {newCommunityDescription}
-                                </Text>
-                            }
-
-                            {
-                                data['notMember'] && <Text style={{ fontWeight: '900', padding: iconSize / 2 }}>You are not a member of this community so you can only see posts available to the public.</Text>
-                            }
-                            {data['length'] === 0 ? <Text style={{ fontWeight: '900', textAlign: 'center', fontSize: width / 20 }}>NO POSTS YET</Text> :
-
-                                <>
-
-                                    <FlatList data={data['post_list']} renderItem={({ item }) =>
-                                        <Post userId={data['user_id']} opId={item['op_id']} communityIsPrivate={data['community_details']['community_is_private']} communityName={data['community_details']['community_name']} communityId={id} isShared={item['is_shared']} id={item['id']} oppfp={item['oppfp']} post={item['post']} display={item['display']} op={item['op']} media1={item['media1']} likes={item['likes']} frowns={item['frowns']} ghost_likes={item['ghost_likes']} comments={item['comments']} shares={item['shares']} allege={item['allege']} />
-                                    } />
-                                </>
-
-                            }
-                        </View>
-                    </>
-            }
-    </View>
-</Layout>
-   
 
             {!isLoading && !data['notMember'] &&
                 <>

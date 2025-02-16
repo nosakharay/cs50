@@ -254,7 +254,7 @@ export default function Profile() {
                                                 // community users are allowed bio of 200 characters.
                                             }
                                             <Text style={processingBio === false ? [styles.bio, { color: 'black' }] : [styles.bio, { color: 'gray' }]}>
-                                                {bio}    <TouchableOpacity onPress={() => { setNewBio(''); setEditBio(true); }}><Icon name='edit' size={iconSize} color={'orange'} /></TouchableOpacity>
+                                                {bio ? bio : 'NO BIO'}    <TouchableOpacity onPress={() => { setNewBio(''); setEditBio(true); }}><Icon name='edit' size={iconSize} color={'orange'} /></TouchableOpacity>
                                             </Text>
 
                                         </ScrollView>
@@ -320,6 +320,8 @@ export default function Profile() {
 
                                 <View>
                                     {
+                                        data['post'].length === 0 ? <Text style={{fontSize:baseFontSize*7, textAlign:'center', fontWeight:'800'}}> No Posts Yet. </Text> : 
+
                                         data['post'].map((item) =>
                                             <View key={item['post_id']}>
 

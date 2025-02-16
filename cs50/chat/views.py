@@ -54,6 +54,7 @@ def chat(request):
             if _other_user.pfp:
 
                 other_user['pfp'] = add_base(request, other_user['pfp'])
+            print(chat_set)
             chat_set['chat']['time'] = process_time(chat_set['chat']['last_text_time'])
             _chat_ = {'chat': chat_set['chat'], 'other_user':other_user}
             chats.append(_chat_)
@@ -64,21 +65,28 @@ def chat(request):
             try:
                 # get all messages associated with the chat to find the last chat
                 _message = Message.objects.filter(chat = chat).order_by("-created").first()
+                print(Message.objects.filter(chat=chat))
+                
                 # serialize chat
                 _chat = ChatSerializer(chat)
                 _chat_ = _chat.data
                 # append last message and the time it was sent
+
+                if _message != None:
             
-                _chat_['last_text'] = _message.message
-                _chat_['last_text_time'] = str(_message.created)
+                    _chat_['last_text'] = _message.message
+                    _chat_['last_text_time'] = str(_message.created)
+                else:
+                    _chat_['last_text'] = 'New Chat'
+                    _chat_['last_text_time'] = str(chat.created)
                 if user_id == chat.user_1:
                     _chat_['is_read'] = chat.user_1_has_read
                 else:
                     _chat_['is_read'] = chat.user_2_has_read
+                
+                return _chat_
             except Exception as e:
-                pass
-
-            return _chat_
+                print(e)
 
         if _chats:
         # loop through all chat objects and serialize
@@ -88,8 +96,17 @@ def chat(request):
                 get_chats(_chat)
 
         if __chats:
+            
             for c in __chats:
+                print('c is', c)
                 _chat = {'chat': serialize_chat(c), 'other': c.user_1}
+                print('seria lized c:', _chat)
+
+                # if returning after new chat, add extra data
+              #  if not _chat{}
+
+
+
                 get_chats(_chat)
 
         # construct return response

@@ -670,10 +670,14 @@ def get_post_by_community(request):
     # construct context object
     context['post_list'] = post_list
     context['length'] = len(post_list)
+    print(_community.description)
     _com_dets = {}
     _com_dets['community_is_private'] = _community.is_private
     _com_dets['community_name'] = _community.name
-    _com_dets['community_description'] = _community.description
+    if _community.description == "null" :
+        _com_dets['community_description'] = "No Description"
+    else:
+        _com_dets['community_description'] = _community.description
     if _community.pfp:
         comm_pfp = add_base(request, '/media/' + str(_community.pfp))
     else:

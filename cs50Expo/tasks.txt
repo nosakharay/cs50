@@ -22,4 +22,5 @@
 . Post extension ui(done)
 . close message socket on exit(done)
 . open if trying to send message but chat socket is close(done)
-. sort post by user distance from poster
+. fix edit communtiy text field bugs( donr )
+. stop community details from setting value as null(done)
